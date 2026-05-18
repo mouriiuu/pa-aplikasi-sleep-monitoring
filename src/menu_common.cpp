@@ -1,6 +1,7 @@
 #include "menu_common.h"
 
 #include <ctime>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 
@@ -27,6 +28,18 @@ string ambilJamSekarang() {
         hasil << '0';
     }
     hasil << waktuLokal->tm_min;
+
+    return hasil.str();
+}
+
+string ambilTanggalSekarang() {
+    time_t waktuSekarang = time(0);
+    tm* waktuLokal = localtime(&waktuSekarang);
+    stringstream hasil;
+
+    hasil << setfill('0') << setw(2) << waktuLokal->tm_mday << '-'
+          << setw(2) << (waktuLokal->tm_mon + 1) << '-'
+          << (waktuLokal->tm_year + 1900);
 
     return hasil.str();
 }

@@ -16,26 +16,28 @@ static int pilihPasienUntukMonitoring(const AppData& data) {
         return -1;
     }
 
-    tampilkanDaftarPasienSingkat(data);
-    cout << "Pilih nomor pasien: ";
-    int pilihan;
-    cin >> pilihan;
+    while (true) {
+        tampilkanDaftarPasienSingkat(data);
+        cout << "Pilih nomor pasien: ";
+        int pilihan;
+        cin >> pilihan;
 
-    if (cin.fail()) {
-        cin.clear();
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "\n[ERROR] Nomor pasien harus angka.\n";
+            continue;
+        }
+
         cin.ignore(10000, '\n');
-        cout << "\n[ERROR] Nomor pasien harus angka.\n";
-        return -1;
+
+        if (pilihan < 1 || pilihan > data.userCount) {
+            cout << "\n[ERROR] Nomor pasien tidak valid.\n";
+            continue;
+        }
+
+        return pilihan - 1;
     }
-
-    cin.ignore(10000, '\n');
-
-    if (pilihan < 1 || pilihan > data.userCount) {
-        cout << "\n[ERROR] Nomor pasien tidak valid.\n";
-        return -1;
-    }
-
-    return pilihan - 1;
 }
 
 static void tampilkanSemuaDataTidurPasien(const AppData& data, const User& pasien) {
@@ -205,10 +207,9 @@ void menuDokter(AppData& data, const string& userFilePath, const string& sleepRe
     do {
         cout << "\n========== MENU DOKTER ==========";
         cout << "\n1. Buat akun pasien";
-        cout << "\n2. Lihat jumlah pasien";
-        cout << "\n3. Lihat daftar pasien";
-        cout << "\n4. Monitoring pasien";
-        cout << "\n5. Logout";
+        cout << "\n2. Lihat daftar pasien";
+        cout << "\n3. Monitoring pasien";
+        cout << "\n4. Logout";
         cout << "\nPilihan: ";
         cin >> pilihan;
 
@@ -226,20 +227,17 @@ void menuDokter(AppData& data, const string& userFilePath, const string& sleepRe
                 buatAkunPasienOlehDokter(data, userFilePath);
                 break;
             case 2:
-                cout << "\nTotal pasien terdaftar: " << data.userCount << "\n";
-                break;
-            case 3:
                 tampilkanDaftarPasienSingkat(data);
                 break;
-            case 4:
+            case 3:
                 monitoringPasienOlehDokter(data, sleepRecordFilePath);
                 break;
-            case 5:
+            case 4:
                 cout << "\nLogout dokter berhasil.\n";
                 break;
             default:
                 cout << "\n[ERROR] Menu tidak tersedia.\n";
                 break;
         }
-    } while (pilihan != 5);
+    } while (pilihan != 4);
 }

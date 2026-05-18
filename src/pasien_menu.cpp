@@ -17,48 +17,98 @@ static int cariJurnalMalamBelumLengkap(const AppData& data, const string& userna
     return -1;
 }
 
+static bool adaJurnalMalamHariIniBelumLengkap(const AppData& data, const string& usernamePasien) {
+    string tanggalHariIni = ambilTanggalSekarang();
+    for (int i = data.sleepRecordCount - 1; i >= 0; i--) {
+        const SleepRecord& record = data.sleepRecords[i];
+        if (record.usernamePasien == usernamePasien &&
+            record.tanggal == tanggalHariIni &&
+            !record.sudahInputPagi) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool sudahAdaJurnalDiTanggalYangSama(const AppData& data, const string& usernamePasien, const string& tanggal) {
+    for (int i = 0; i < data.sleepRecordCount; i++) {
+        const SleepRecord& record = data.sleepRecords[i];
+        if (record.usernamePasien == usernamePasien && record.tanggal == tanggal) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool sudahAdaInputPagiDiTanggalYangSama(const AppData& data, const string& usernamePasien, const string& tanggal, int abaikanIndex) {
+    for (int i = 0; i < data.sleepRecordCount; i++) {
+        if (i == abaikanIndex) {
+            continue;
+        }
+
+        const SleepRecord& record = data.sleepRecords[i];
+        if (record.usernamePasien == usernamePasien &&
+            record.tanggal == tanggal &&
+            record.sudahInputPagi) {
+            return true;
+        }
+    }
+    return false;
+}
+
 static void isiJurnalMalam(AppData& data, int userIndex, const string& sleepRecordFilePath) {
     if (data.sleepRecordCount >= MAX_SLEEP_RECORDS) {
         cout << "\n[ERROR] Kapasitas data tidur penuh.\n";
         return;
     }
 
-    cout << "\n--- JURNAL MALAM ---\n";
+    while (true) {
+        string usernamePasien = data.users[userIndex].username;
+        string tanggal = ambilTanggalSekarang();
+        if (sudahAdaJurnalDiTanggalYangSama(data, usernamePasien, tanggal)) {
+            cout << "\n[ERROR] Jurnal malam untuk tanggal " << tanggal << " sudah ada.\n";
+            cout << "[INFO] Kamu hanya bisa isi 1 jurnal malam per hari.\n";
+            return;
+        }
 
-    string tanggal = inputBarisMenu("Tanggal (contoh 30-04-2026): ");
-    string catatanMalam = inputBarisMenu("Catatan sebelum tidur       : ");
+        cout << "\n--- JURNAL MALAM ---\n";
+        cout << "Tanggal otomatis            : " << tanggal << "\n";
+        string catatanMalam = inputBarisMenu("Catatan sebelum tidur       : ");
 
-    if (tanggal.empty() || catatanMalam.empty()) {
-        cout << "\n[ERROR] Semua field wajib diisi.\n";
+        if (catatanMalam.empty()) {
+            cout << "\n[ERROR] Catatan sebelum tidur wajib diisi.\n";
+            continue;
+        }
+
+        if (berisiKarakterTerlarang(catatanMalam)) {
+            cout << "\n[ERROR] Karakter '|' tidak boleh dipakai.\n";
+            continue;
+        }
+
+        SleepRecord& record = data.sleepRecords[data.sleepRecordCount];
+        record.usernamePasien = usernamePasien;
+        record.tanggal = tanggal;
+        record.jamMulaiSesiMalam = ambilJamSekarang();
+        record.catatanMalam = catatanMalam;
+        record.jamMulaiTidurFinal = "-";
+        record.jamBangun = "-";
+        record.jumlahTerbangun = 0;
+        record.totalTerjagaMenit = 0;
+        record.kualitasTidur = 0;
+        record.kondisiBangun = "-";
+        record.sudahInputPagi = false;
+        data.sleepRecordCount++;
+
+        if (!saveSleepRecordsToFile(data, sleepRecordFilePath)) {
+            cout << "\n[ERROR] Data jurnal malam gagal disimpan.\n";
+            data.sleepRecordCount--;
+            continue;
+        }
+
+        cout << "\n[SUKSES] Jurnal malam tersimpan.\n";
+        cout << "Jam mulai sesi malam otomatis: " << record.jamMulaiSesiMalam << "\n";
         return;
     }
-
-    if (berisiKarakterTerlarang(tanggal) || berisiKarakterTerlarang(catatanMalam)) {
-        cout << "\n[ERROR] Karakter '|' tidak boleh dipakai.\n";
-        return;
-    }
-
-    SleepRecord& record = data.sleepRecords[data.sleepRecordCount];
-    record.usernamePasien = data.users[userIndex].username;
-    record.tanggal = tanggal;
-    record.jamMulaiSesiMalam = ambilJamSekarang();
-    record.catatanMalam = catatanMalam;
-    record.jamMulaiTidurFinal = "-";
-    record.jamBangun = "-";
-    record.jumlahTerbangun = 0;
-    record.totalTerjagaMenit = 0;
-    record.kualitasTidur = 0;
-    record.kondisiBangun = "-";
-    record.sudahInputPagi = false;
-    data.sleepRecordCount++;
-
-    if (!saveSleepRecordsToFile(data, sleepRecordFilePath)) {
-        cout << "\n[ERROR] Data jurnal malam gagal disimpan.\n";
-        return;
-    }
-
-    cout << "\n[SUKSES] Jurnal malam tersimpan.\n";
-    cout << "Jam mulai sesi malam otomatis: " << record.jamMulaiSesiMalam << "\n";
 }
 
 static void inputDataPagi(AppData& data, int userIndex, const string& sleepRecordFilePath) {
@@ -71,97 +121,98 @@ static void inputDataPagi(AppData& data, int userIndex, const string& sleepRecor
     }
 
     SleepRecord& record = data.sleepRecords[recordIndex];
+    if (sudahAdaInputPagiDiTanggalYangSama(data, usernamePasien, record.tanggal, recordIndex)) {
+        cout << "\n[ERROR] Data pagi untuk tanggal " << record.tanggal << " sudah pernah diinput.\n";
+        cout << "[INFO] Input data pagi hanya boleh 1 kali per hari.\n";
+        return;
+    }
 
-    cout << "\n--- INPUT DATA SETELAH BANGUN ---\n";
-    cout << "Tanggal jurnal malam : " << record.tanggal << "\n";
-    cout << "Jam sesi malam       : " << record.jamMulaiSesiMalam << "\n";
+    while (true) {
+        cout << "\n--- INPUT DATA SETELAH BANGUN ---\n";
+        cout << "Tanggal jurnal malam : " << record.tanggal << "\n";
+        cout << "Jam sesi malam       : " << record.jamMulaiSesiMalam << "\n";
 
-    string jamMulaiTidurFinal = inputBarisMenu("Jam mulai tidur final        : ");
-    string jamBangun = inputBarisMenu("Jam bangun                   : ");
-    int jumlahTerbangun;
-    int totalTerjagaMenit;
-    int kualitasTidur;
+        string jamMulaiTidurFinal = inputBarisMenu("Jam mulai tidur final        : ");
+        string jamBangun = inputBarisMenu("Jam bangun                   : ");
+        int jumlahTerbangun;
+        int totalTerjagaMenit;
+        int kualitasTidur;
 
-    cout << "Jumlah terbangun             : ";
-    cin >> jumlahTerbangun;
-    if (cin.fail()) {
-        cin.clear();
+        cout << "Jumlah terbangun             : ";
+        cin >> jumlahTerbangun;
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "\n[ERROR] Jumlah terbangun harus angka.\n";
+            continue;
+        }
+
+        cout << "Total lama terjaga (menit)   : ";
+        cin >> totalTerjagaMenit;
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "\n[ERROR] Total terjaga harus angka.\n";
+            continue;
+        }
+
+        cout << "Kualitas tidur (1-10)        : ";
+        cin >> kualitasTidur;
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "\n[ERROR] Kualitas tidur harus angka.\n";
+            continue;
+        }
+
         cin.ignore(10000, '\n');
-        cout << "\n[ERROR] Jumlah terbangun harus angka.\n";
+        string kondisiBangun = inputBarisMenu("Kondisi saat bangun          : ");
+
+        if (jamMulaiTidurFinal.empty() || jamBangun.empty() || kondisiBangun.empty()) {
+            cout << "\n[ERROR] Semua field wajib diisi.\n";
+            continue;
+        }
+
+        if (!formatJamValid(jamMulaiTidurFinal) || !formatJamValid(jamBangun)) {
+            cout << "\n[ERROR] Format jam harus HH:MM (24 jam).\n";
+            continue;
+        }
+
+        if (jumlahTerbangun < 0 || totalTerjagaMenit < 0 || kualitasTidur < 1 || kualitasTidur > 10) {
+            cout << "\n[ERROR] Input angka tidak valid.\n";
+            continue;
+        }
+
+        if (berisiKarakterTerlarang(jamMulaiTidurFinal) || berisiKarakterTerlarang(jamBangun) || berisiKarakterTerlarang(kondisiBangun)) {
+            cout << "\n[ERROR] Karakter '|' tidak boleh dipakai.\n";
+            continue;
+        }
+
+        int mulaiTidurFinalMenit = konversiJamKeMenit(jamMulaiTidurFinal);
+        int jamBangunMenit = konversiJamKeMenit(jamBangun);
+        int durasiTidurDasar = hitungSelisihMenit(mulaiTidurFinalMenit, jamBangunMenit);
+        if (totalTerjagaMenit > durasiTidurDasar) {
+            cout << "\n[ERROR] Total terjaga melebihi durasi dari mulai tidur final hingga bangun.\n";
+            continue;
+        }
+
+        record.jamMulaiTidurFinal = jamMulaiTidurFinal;
+        record.jamBangun = jamBangun;
+        record.jumlahTerbangun = jumlahTerbangun;
+        record.totalTerjagaMenit = totalTerjagaMenit;
+        record.kualitasTidur = kualitasTidur;
+        record.kondisiBangun = kondisiBangun;
+        record.sudahInputPagi = true;
+
+        if (!saveSleepRecordsToFile(data, sleepRecordFilePath)) {
+            cout << "\n[ERROR] Data pagi gagal disimpan.\n";
+            continue;
+        }
+
+        cout << "\n[SUKSES] Data pagi tersimpan dan tergabung dengan jurnal malam.\n";
+        tampilkanIndikatorSleepDiary(record);
         return;
     }
-
-    cout << "Total lama terjaga (menit)   : ";
-    cin >> totalTerjagaMenit;
-    if (cin.fail()) {
-        cin.clear();
-        cin.ignore(10000, '\n');
-        cout << "\n[ERROR] Total terjaga harus angka.\n";
-        return;
-    }
-
-    cout << "Kualitas tidur (1-10)        : ";
-    cin >> kualitasTidur;
-    if (cin.fail()) {
-        cin.clear();
-        cin.ignore(10000, '\n');
-        cout << "\n[ERROR] Kualitas tidur harus angka.\n";
-        return;
-    }
-
-    cin.ignore(10000, '\n');
-    string kondisiBangun = inputBarisMenu("Kondisi saat bangun          : ");
-
-    if (jamMulaiTidurFinal.empty() || jamBangun.empty() || kondisiBangun.empty()) {
-        cout << "\n[ERROR] Semua field wajib diisi.\n";
-        return;
-    }
-
-    if (!formatJamValid(jamMulaiTidurFinal) || !formatJamValid(jamBangun)) {
-        cout << "\n[ERROR] Format jam harus HH:MM (24 jam).\n";
-        return;
-    }
-
-    if (jumlahTerbangun < 0 || totalTerjagaMenit < 0 || kualitasTidur < 1 || kualitasTidur > 10) {
-        cout << "\n[ERROR] Input angka tidak valid.\n";
-        return;
-    }
-
-    if (berisiKarakterTerlarang(jamMulaiTidurFinal) || berisiKarakterTerlarang(jamBangun) || berisiKarakterTerlarang(kondisiBangun)) {
-        cout << "\n[ERROR] Karakter '|' tidak boleh dipakai.\n";
-        return;
-    }
-
-    record.jamMulaiTidurFinal = jamMulaiTidurFinal;
-    record.jamBangun = jamBangun;
-    record.jumlahTerbangun = jumlahTerbangun;
-    record.totalTerjagaMenit = totalTerjagaMenit;
-    record.kualitasTidur = kualitasTidur;
-    record.kondisiBangun = kondisiBangun;
-    record.sudahInputPagi = true;
-
-    int mulaiTidurFinalMenit = konversiJamKeMenit(record.jamMulaiTidurFinal);
-    int jamBangunMenit = konversiJamKeMenit(record.jamBangun);
-    int durasiTidurDasar = hitungSelisihMenit(mulaiTidurFinalMenit, jamBangunMenit);
-    if (record.totalTerjagaMenit > durasiTidurDasar) {
-        cout << "\n[ERROR] Total terjaga melebihi durasi dari mulai tidur final hingga bangun.\n";
-        record.jamMulaiTidurFinal = "-";
-        record.jamBangun = "-";
-        record.jumlahTerbangun = 0;
-        record.totalTerjagaMenit = 0;
-        record.kualitasTidur = 0;
-        record.kondisiBangun = "-";
-        record.sudahInputPagi = false;
-        return;
-    }
-
-    if (!saveSleepRecordsToFile(data, sleepRecordFilePath)) {
-        cout << "\n[ERROR] Data pagi gagal disimpan.\n";
-        return;
-    }
-
-    cout << "\n[SUKSES] Data pagi tersimpan dan tergabung dengan jurnal malam.\n";
-    tampilkanIndikatorSleepDiary(record);
 }
 
 static void lihatsleepdairypasien(const AppData& data, int userIndex) {
@@ -201,66 +252,67 @@ static void lihatsleepdairypasien(const AppData& data, int userIndex) {
 }
 
 static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFilePath) {
-    string usernamePasien = data.users[userIndex].username;
+    while (true) {
+        string usernamePasien = data.users[userIndex].username;
 
-    int daftarIndex[MAX_SLEEP_RECORDS];
-    int jumlah = 0;
+        int daftarIndex[MAX_SLEEP_RECORDS];
+        int jumlah = 0;
 
-    cout << "\n--- PILIH JURNAL YANG INGIN DIEDIT ---\n";
-    for (int i = 0; i < data.sleepRecordCount; i++) {
-        if (data.sleepRecords[i].usernamePasien == usernamePasien) {
-            string status = data.sleepRecords[i].sudahInputPagi ? "[Lengkap]" : "[Belum ada data pagi]";
-            cout << jumlah + 1 << ". Tanggal: " << data.sleepRecords[i].tanggal << " " << status << "\n";
-            daftarIndex[jumlah++] = i;
+        cout << "\n--- PILIH JURNAL YANG INGIN DIEDIT ---\n";
+        for (int i = 0; i < data.sleepRecordCount; i++) {
+            if (data.sleepRecords[i].usernamePasien == usernamePasien) {
+                string status = data.sleepRecords[i].sudahInputPagi ? "[Lengkap]" : "[Belum ada data pagi]";
+                cout << jumlah + 1 << ". Tanggal: " << data.sleepRecords[i].tanggal << " " << status << "\n";
+                daftarIndex[jumlah++] = i;
+            }
         }
-    }
 
-    if (jumlah == 0) {
-        cout << "\n[ERROR] Tidak ada jurnal yang ditemukan.\n";
-        return;
-    }
+        if (jumlah == 0) {
+            cout << "\n[ERROR] Tidak ada jurnal yang ditemukan.\n";
+            return;
+        }
 
-    int pilih;
-    cout << "Pilih nomor jurnal (Enter untuk batal): ";
-    string inputpilihan;
-    getline(cin, inputpilihan);
+        int pilih;
+        cout << "Pilih nomor jurnal (Enter untuk batal): ";
+        string inputpilihan;
+        getline(cin, inputpilihan);
 
-    if (inputpilihan.empty()) {
-        cout << "\n[INFO] Edit dibatalkan.\n";
-        return;
-    }
+        if (inputpilihan.empty()) {
+            cout << "\n[INFO] Edit dibatalkan.\n";
+            return;
+        }
 
-    try {
-        pilih = stoi(inputpilihan);
-    } catch (...) {
-        cout << "\n[ERROR] Pilihan harus berupa angka.\n";
-        return;
-    }
+        try {
+            pilih = stoi(inputpilihan);
+        } catch (...) {
+            cout << "\n[ERROR] Pilihan harus berupa angka.\n";
+            continue;
+        }
 
-    if (pilih < 1 || pilih > jumlah) {
-        cout << "\n[ERROR] Pilihan tidak valid.\n";
-        return;
-    }
+        if (pilih < 1 || pilih > jumlah) {
+            cout << "\n[ERROR] Pilihan tidak valid.\n";
+            continue;
+        }
 
-    SleepRecord& record = data.sleepRecords[daftarIndex[pilih - 1]];
+        SleepRecord& record = data.sleepRecords[daftarIndex[pilih - 1]];
 
-    cout << "\n--- EDIT JURNAL TANGGAL: " << record.tanggal << " ---\n";
-    cout << "1. Edit jurnal malam (tanggal & catatan malam)\n";
-    cout << "2. Edit data pagi (jam tidur, jam bangun, dll)\n";
-    cout << "3. Batal\n";
-    cout << "Pilihan: ";
+        cout << "\n--- EDIT JURNAL TANGGAL: " << record.tanggal << " ---\n";
+        cout << "1. Edit jurnal malam (tanggal & catatan malam)\n";
+        cout << "2. Edit data pagi (jam tidur, jam bangun, dll)\n";
+        cout << "3. Batal\n";
+        cout << "Pilihan: ";
 
-    int pilihanEdit;
-    cin >> pilihanEdit;
-    if (cin.fail()) {
-        cin.clear();
+        int pilihanEdit;
+        cin >> pilihanEdit;
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "\n[ERROR] Pilihan harus angka.\n";
+            continue;
+        }
         cin.ignore(10000, '\n');
-        cout << "\n[ERROR] Pilihan harus angka.\n";
-        return;
-    }
-    cin.ignore(10000, '\n');
 
-    if (pilihanEdit == 1) {
+        if (pilihanEdit == 1) {
         cout << "\n--- EDIT JURNAL MALAM ---\n";
         cout << "Tanggal saat ini     : " << record.tanggal << "\n";
         cout << "Catatan saat ini     : " << record.catatanMalam << "\n";
@@ -271,7 +323,7 @@ static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFi
 
         if (berisiKarakterTerlarang(tanggalBaru) || berisiKarakterTerlarang(catatanBaru)) {
             cout << "\n[ERROR] Karakter '|' tidak boleh dipakai.\n";
-            return;
+            continue;
         }
 
         if (!tanggalBaru.empty()) record.tanggal = tanggalBaru;
@@ -279,13 +331,14 @@ static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFi
 
         if (!saveSleepRecordsToFile(data, sleepRecordFilePath)) {
             cout << "\n[ERROR] Gagal menyimpan perubahan.\n";
-            return;
+            continue;
         }
         cout << "\n[SUKSES] Jurnal malam berhasil diperbarui.\n";
+        return;
     } else if (pilihanEdit == 2) {
         if (!record.sudahInputPagi) {
             cout << "\n[INFO] Data pagi belum pernah diisi. Gunakan menu 'Input data setelah bangun'.\n";
-            return;
+            continue;
         }
 
         cout << "\n--- EDIT DATA PAGI ---\n";
@@ -306,11 +359,11 @@ static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFi
 
         if (!jamTidurBaru.empty() && !formatJamValid(jamTidurBaru)) {
             cout << "\n[ERROR] Format jam mulai tidur harus HH:MM.\n";
-            return;
+            continue;
         }
         if (!jamBangunBaru.empty() && !formatJamValid(jamBangunBaru)) {
             cout << "\n[ERROR] Format jam bangun harus HH:MM.\n";
-            return;
+            continue;
         }
 
         int terbangunBaru = record.jumlahTerbangun;
@@ -319,11 +372,11 @@ static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFi
                 terbangunBaru = stoi(inputTerbangun);
             } catch (...) {
                 cout << "\n[ERROR] Jumlah terbangun harus angka.\n";
-                return;
+                continue;
             }
             if (terbangunBaru < 0) {
                 cout << "\n[ERROR] Jumlah terbangun tidak boleh negatif.\n";
-                return;
+                continue;
             }
         }
 
@@ -333,11 +386,11 @@ static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFi
                 terjagaBaru = stoi(inputTerjaga);
             } catch (...) {
                 cout << "\n[ERROR] Total terjaga harus angka.\n";
-                return;
+                continue;
             }
             if (terjagaBaru < 0) {
                 cout << "\n[ERROR] Total terjaga tidak boleh negatif.\n";
-                return;
+                continue;
             }
         }
 
@@ -347,18 +400,18 @@ static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFi
                 kualitasBaru = stoi(inputKualitas);
             } catch (...) {
                 cout << "\n[ERROR] Kualitas tidur harus angka.\n";
-                return;
+                continue;
             }
             if (kualitasBaru < 1 || kualitasBaru > 10) {
                 cout << "\n[ERROR] Kualitas tidur harus antara 1-10.\n";
-                return;
+                continue;
             }
         }
 
         if (berisiKarakterTerlarang(jamTidurBaru) || berisiKarakterTerlarang(jamBangunBaru) ||
             berisiKarakterTerlarang(kondisiBaru)) {
             cout << "\n[ERROR] Karakter '|' tidak boleh dipakai.\n";
-            return;
+            continue;
         }
 
         string jamTidurFinal = jamTidurBaru.empty() ? record.jamMulaiTidurFinal : jamTidurBaru;
@@ -366,13 +419,13 @@ static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFi
 
         if (!formatJamValid(jamTidurFinal) || !formatJamValid(jamBangunFinal)) {
             cout << "\n[ERROR] Data jam tersimpan tidak valid. Periksa dan isi ulang format HH:MM.\n";
-            return;
+            continue;
         }
 
         int durasiDasar = hitungSelisihMenit(konversiJamKeMenit(jamTidurFinal), konversiJamKeMenit(jamBangunFinal));
         if (terjagaBaru > durasiDasar) {
             cout << "\n[ERROR] Total terjaga melebihi durasi dari mulai tidur final hingga bangun.\n";
-            return;
+            continue;
         }
 
         record.jamMulaiTidurFinal = jamTidurFinal;
@@ -384,100 +437,126 @@ static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFi
 
         if (!saveSleepRecordsToFile(data, sleepRecordFilePath)) {
             cout << "\n[ERROR] Gagal menyimpan perubahan.\n";
-            return;
+            continue;
         }
         cout << "\n[SUKSES] Data pagi berhasil diperbarui.\n";
         tampilkanIndikatorSleepDiary(record);
+        return;
     } else if (pilihanEdit == 3) {
         cout << "\n[INFO] Edit dibatalkan.\n";
+        return;
     } else {
         cout << "\n[ERROR] Pilihan tidak valid.\n";
+        continue;
+    }
     }
 }
 
 static void hapusdatajurnal(AppData& data, int userIndex, const string& sleepRecordFilePath) {
-    string usernamePasien = data.users[userIndex].username;
+    while (true) {
+        string usernamePasien = data.users[userIndex].username;
 
-    cout << "\n--- PILIH JURNAL YANG MAU DIHAPUS ---\n";
+        cout << "\n--- PILIH JURNAL YANG MAU DIHAPUS ---\n";
 
-    int daftarIndex[MAX_SLEEP_RECORDS];
-    int jumlah = 0;
+        int daftarIndex[MAX_SLEEP_RECORDS];
+        int jumlah = 0;
 
-    for (int i = 0; i < data.sleepRecordCount; i++) {
-        if (data.sleepRecords[i].usernamePasien == usernamePasien) {
-            cout << jumlah + 1 << ". Tanggal: " << data.sleepRecords[i].tanggal << endl;
-            daftarIndex[jumlah++] = i;
+        for (int i = 0; i < data.sleepRecordCount; i++) {
+            if (data.sleepRecords[i].usernamePasien == usernamePasien) {
+                cout << jumlah + 1 << ". Tanggal: " << data.sleepRecords[i].tanggal << endl;
+                daftarIndex[jumlah++] = i;
+            }
         }
-    }
 
-    if (jumlah == 0) {
-        cout << "\n[ERROR] Tidak ada jurnal yang ditemukan.\n";
+        if (jumlah == 0) {
+            cout << "\n[ERROR] Tidak ada jurnal yang ditemukan.\n";
+            return;
+        }
+
+        int pilih;
+        cout << "Pilih nomor jurnal (Enter untuk batal): ";
+        string inputpilihan;
+        getline(cin, inputpilihan);
+
+        if (inputpilihan.empty()) {
+            cout << "\n[INFO] Edit dibatalkan.\n";
+            return;
+        }
+
+        try {
+            pilih = stoi(inputpilihan);
+        } catch (...) {
+            cout << "\n[ERROR] Pilihan harus berupa angka.\n";
+            continue;
+        }
+
+        if (pilih < 1 || pilih > jumlah) {
+            cout << "\n[ERROR] Pilihan tidak valid.\n";
+            continue;
+        }
+
+        int recordIndex = daftarIndex[pilih - 1];
+
+        string inputKonfirmasi;
+        cout << "Yakin ingin menghapus jurnal tanggal " << data.sleepRecords[recordIndex].tanggal << "? (y/n): ";
+
+        do {
+            getline(cin, inputKonfirmasi);
+        } while (inputKonfirmasi != "y" && inputKonfirmasi != "Y" &&
+                 inputKonfirmasi != "n" && inputKonfirmasi != "N");
+
+        if (inputKonfirmasi == "n" || inputKonfirmasi == "N") {
+            cout << "\n[INFO] Penghapusan dibatalkan.\n";
+            return;
+        }
+
+        for (int i = recordIndex; i < data.sleepRecordCount - 1; i++) {
+            data.sleepRecords[i] = data.sleepRecords[i + 1];
+        }
+        data.sleepRecordCount--;
+
+        if (!saveSleepRecordsToFile(data, sleepRecordFilePath)) {
+            cout << "\n[ERROR] Gagal menyimpan perubahan setelah hapus.\n";
+            continue;
+        }
+
+        cout << "\n[SUKSES] Jurnal berhasil dihapus.\n";
         return;
     }
-
-    int pilih;
-    cout << "Pilih nomor jurnal (Enter untuk batal): ";
-    string inputpilihan;
-    getline(cin, inputpilihan);
-
-    if (inputpilihan.empty()) {
-        cout << "\n[INFO] Edit dibatalkan.\n";
-        return;
-    }
-
-    try {
-        pilih = stoi(inputpilihan);
-    } catch (...) {
-        cout << "\n[ERROR] Pilihan harus berupa angka.\n";
-        return;
-    }
-
-    if (pilih < 1 || pilih > jumlah) {
-        cout << "\n[ERROR] Pilihan tidak valid.\n";
-        return;
-    }
-
-    int recordIndex = daftarIndex[pilih - 1];
-
-    string inputKonfirmasi;
-    cout << "Yakin ingin menghapus jurnal tanggal " << data.sleepRecords[recordIndex].tanggal << "? (y/n): ";
-
-    do {
-        getline(cin, inputKonfirmasi);
-    } while (inputKonfirmasi != "y" && inputKonfirmasi != "Y" &&
-             inputKonfirmasi != "n" && inputKonfirmasi != "N");
-
-    if (inputKonfirmasi == "n" || inputKonfirmasi == "N") {
-        cout << "\n[INFO] Penghapusan dibatalkan.\n";
-        return;
-    }
-
-    for (int i = recordIndex; i < data.sleepRecordCount - 1; i++) {
-        data.sleepRecords[i] = data.sleepRecords[i + 1];
-    }
-    data.sleepRecordCount--;
-
-    if (!saveSleepRecordsToFile(data, sleepRecordFilePath)) {
-        cout << "\n[ERROR] Gagal menyimpan perubahan setelah hapus.\n";
-        return;
-    }
-
-    cout << "\n[SUKSES] Jurnal berhasil dihapus.\n";
 }
 
 void menuPasien(AppData& data, int userIndex, const string& sleepRecordFilePath) {
     int pilihan;
+    bool selesai = false;
 
     do {
+        string usernamePasien = data.users[userIndex].username;
+        string tanggalHariIni = ambilTanggalSekarang();
+        bool tampilIsiJurnalMalam = !sudahAdaJurnalDiTanggalYangSama(data, usernamePasien, tanggalHariIni);
+        bool tampilInputPagi = adaJurnalMalamHariIniBelumLengkap(data, usernamePasien);
+
+        int nomorMenu = 1;
+        int opsiProfil = nomorMenu++;
+        int opsiIsiJurnalMalam = tampilIsiJurnalMalam ? nomorMenu++ : -1;
+        int opsiInputPagi = tampilInputPagi ? nomorMenu++ : -1;
+        int opsiLihatSemua = nomorMenu++;
+        int opsiEdit = nomorMenu++;
+        int opsiHapus = nomorMenu++;
+        int opsiLogout = nomorMenu++;
+
         cout << "\n========== MENU PASIEN ==========";
         cout << "\nLogin sebagai : " << data.users[userIndex].nama << endl;
-        cout << "\n1. Lihat profil singkat";
-        cout << "\n2. Isi jurnal malam";
-        cout << "\n3. Input data setelah bangun";
-        cout << "\n4. Lihat seluruh data sleep diary";
-        cout << "\n5. Edit jurnal";
-        cout << "\n6. Hapus data jurnal";
-        cout << "\n7. Logout";
+        cout << "\n" << opsiProfil << ". Lihat profil singkat";
+        if (tampilIsiJurnalMalam) {
+            cout << "\n" << opsiIsiJurnalMalam << ". Isi jurnal malam";
+        }
+        if (tampilInputPagi) {
+            cout << "\n" << opsiInputPagi << ". Input data setelah bangun";
+        }
+        cout << "\n" << opsiLihatSemua << ". Lihat seluruh data sleep diary";
+        cout << "\n" << opsiEdit << ". Edit jurnal";
+        cout << "\n" << opsiHapus << ". Hapus data jurnal";
+        cout << "\n" << opsiLogout << ". Logout";
         cout << "\nPilihan: ";
         cin >> pilihan;
 
@@ -490,33 +569,25 @@ void menuPasien(AppData& data, int userIndex, const string& sleepRecordFilePath)
 
         cin.ignore(10000, '\n');
 
-        switch (pilihan) {
-            case 1:
-                cout << "\n--- PROFIL PASIEN ---\n";
-                cout << "Nama     : " << data.users[userIndex].nama << "\n";
-                cout << "Username : " << data.users[userIndex].username << "\n";
-                break;
-            case 2:
-                isiJurnalMalam(data, userIndex, sleepRecordFilePath);
-                break;
-            case 3:
-                inputDataPagi(data, userIndex, sleepRecordFilePath);
-                break;
-            case 4:
-                lihatsleepdairypasien(data, userIndex);
-                break;
-            case 5:
-                editjurnal(data, userIndex, sleepRecordFilePath);
-                break;
-            case 6:
-                hapusdatajurnal(data, userIndex, sleepRecordFilePath);
-                break;
-            case 7:
-                cout << "\nLogout pasien berhasil.\n";
-                break;
-            default:
-                cout << "\n[ERROR] Menu tidak tersedia.\n";
-                break;
+        if (pilihan == opsiProfil) {
+            cout << "\n--- PROFIL PASIEN ---\n";
+            cout << "Nama     : " << data.users[userIndex].nama << "\n";
+            cout << "Username : " << data.users[userIndex].username << "\n";
+        } else if (pilihan == opsiIsiJurnalMalam) {
+            isiJurnalMalam(data, userIndex, sleepRecordFilePath);
+        } else if (pilihan == opsiInputPagi) {
+            inputDataPagi(data, userIndex, sleepRecordFilePath);
+        } else if (pilihan == opsiLihatSemua) {
+            lihatsleepdairypasien(data, userIndex);
+        } else if (pilihan == opsiEdit) {
+            editjurnal(data, userIndex, sleepRecordFilePath);
+        } else if (pilihan == opsiHapus) {
+            hapusdatajurnal(data, userIndex, sleepRecordFilePath);
+        } else if (pilihan == opsiLogout) {
+            cout << "\nLogout pasien berhasil.\n";
+            selesai = true;
+        } else {
+            cout << "\n[ERROR] Menu tidak tersedia.\n";
         }
-    } while (pilihan != 7);
+    } while (!selesai);
 }

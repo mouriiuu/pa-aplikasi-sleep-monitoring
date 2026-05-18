@@ -32,44 +32,47 @@ bool buatAkunPasienOlehDokter(AppData& data, const string& userFilePath) {
         return false;
     }
 
-    cout << "\n--- BUAT AKUN PASIEN (OLEH DOKTER) ---\n";
+    while (true) {
+        cout << "\n--- BUAT AKUN PASIEN (OLEH DOKTER) ---\n";
 
-    string nama = inputBaris("Nama lengkap   : ");
-    string username = inputBaris("Username       : ");
-    string password = inputBaris("Password       : ");
+        string nama = inputBaris("Nama lengkap   : ");
+        string username = inputBaris("Username       : ");
+        string password = inputBaris("Password       : ");
 
-    if (nama.empty() || username.empty() || password.empty()) {
-        cout << "\n[ERROR] Semua field wajib diisi.\n";
-        return false;
+        if (nama.empty() || username.empty() || password.empty()) {
+            cout << "\n[ERROR] Semua field wajib diisi.\n";
+            continue;
+        }
+
+        if (password.length() < 6) {
+            cout << "\n[ERROR] Password minimal 6 karakter.\n";
+            continue;
+        }
+
+        if (username.find('|') != string::npos || nama.find('|') != string::npos || password.find('|') != string::npos) {
+            cout << "\n[ERROR] Karakter '|' tidak boleh dipakai.\n";
+            continue;
+        }
+
+        if (usernameSudahAda(data, username)) {
+            cout << "\n[ERROR] Username sudah dipakai. Gunakan username lain.\n";
+            continue;
+        }
+
+        data.users[data.userCount].nama = nama;
+        data.users[data.userCount].username = username;
+        data.users[data.userCount].password = password;
+        data.userCount++;
+
+        if (!saveUsersToFile(data, userFilePath)) {
+            cout << "\n[ERROR] Data user gagal disimpan ke file.\n";
+            data.userCount--;
+            continue;
+        }
+
+        cout << "\n[SUKSES] Akun pasien berhasil dibuat dan tersimpan di file TXT.\n";
+        return true;
     }
-
-    if (password.length() < 6) {
-        cout << "\n[ERROR] Password minimal 6 karakter.\n";
-        return false;
-    }
-
-    if (username.find('|') != string::npos || nama.find('|') != string::npos || password.find('|') != string::npos) {
-        cout << "\n[ERROR] Karakter '|' tidak boleh dipakai.\n";
-        return false;
-    }
-
-    if (usernameSudahAda(data, username)) {
-        cout << "\n[ERROR] Username sudah dipakai. Gunakan username lain.\n";
-        return false;
-    }
-
-    data.users[data.userCount].nama = nama;
-    data.users[data.userCount].username = username;
-    data.users[data.userCount].password = password;
-    data.userCount++;
-
-    if (!saveUsersToFile(data, userFilePath)) {
-        cout << "\n[ERROR] Data user gagal disimpan ke file.\n";
-        return false;
-    }
-
-    cout << "\n[SUKSES] Akun pasien berhasil dibuat dan tersimpan di file TXT.\n";
-    return true;
 }
 
 int loginPasien(const AppData& data) {
