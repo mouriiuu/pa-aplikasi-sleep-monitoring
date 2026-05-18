@@ -1,7 +1,9 @@
 #include "dokter_menu.h"
 
+#include <cctype>
 #include <iomanip>
 #include <iostream>
+#include <vector>
 
 #include "auth/auth.h"
 #include "data_store.h"
@@ -9,6 +11,132 @@
 #include "sleep_metrics.h"
 
 using namespace std;
+
+static string keHurufKecil(const string& teks) {
+    string hasil = teks;
+    for (size_t i = 0; i < hasil.length(); i++) {
+        hasil[i] = static_cast<char>(tolower(static_cast<unsigned char>(hasil[i])));
+    }
+    return hasil;
+}
+
+static bool mengandungTanpaCase(const string& sumber, const string& kataKunci) {
+    return keHurufKecil(sumber).find(keHurufKecil(kataKunci)) != string::npos;
+}
+
+static void tampilkanDaftarPasienByIndex(const AppData& data, const vector<int>& indeksPasien) {
+    if (indeksPasien.empty()) {
+        cout << "- Tidak ada pasien yang cocok.\n";
+        return;
+    }
+
+    for (size_t i = 0; i < indeksPasien.size(); i++) {
+        int idx = indeksPasien[i];
+        cout << i + 1 << ". " << data.users[idx].nama << " (" << data.users[idx].username << ")\n";
+    }
+}
+
+static void cariPasien(const AppData& data) {
+    if (data.userCount == 0) {
+        cout << "\n[ERROR] Belum ada pasien terdaftar.\n";
+        return;
+    }
+
+    string kataKunci;
+    while (true) {
+        kataKunci = inputBarisMenu("\nKata kunci nama/username: ");
+        if (kataKunci.empty()) {
+            cout << "\n[ERROR] Kata kunci tidak boleh kosong. Silakan ulangi.\n";
+            continue;
+        }
+        break;
+    }
+
+    vector<int> hasil;
+    for (int i = 0; i < data.userCount; i++) {
+        if (mengandungTanpaCase(data.users[i].nama, kataKunci) ||
+            mengandungTanpaCase(data.users[i].username, kataKunci)) {
+            hasil.push_back(i);
+        }
+    }
+
+    cout << "\nHasil pencarian pasien:\n";
+    tampilkanDaftarPasienByIndex(data, hasil);
+}
+
+static void urutkanDanTampilkanPasien(const AppData& data) {
+    if (data.userCount == 0) {
+        cout << "\n[ERROR] Belum ada pasien terdaftar.\n";
+        return;
+    }
+
+    int pilihanSort;
+    while (true) {
+        cout << "\n--- SORT DAFTAR PASIEN ---\n";
+        cout << "1. Nama A-Z\n";
+        cout << "2. Nama Z-A\n";
+        cout << "3. Username A-Z\n";
+        cout << "4. Username Z-A\n";
+        cout << "Pilihan sort: ";
+
+        cin >> pilihanSort;
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "\n[ERROR] Pilihan sort harus angka. Silakan ulangi.\n";
+            continue;
+        }
+        cin.ignore(10000, '\n');
+
+        if (pilihanSort < 1 || pilihanSort > 4) {
+            cout << "\n[ERROR] Pilihan sort tidak valid. Silakan ulangi.\n";
+            continue;
+        }
+        break;
+    }
+
+    vector<int> indeksPasien;
+    for (int i = 0; i < data.userCount; i++) {
+        indeksPasien.push_back(i);
+    }
+
+    auto harusTukar = [&data, pilihanSort](int kiri, int kanan) {
+        string nilaiKiri;
+        string nilaiKanan;
+
+        if (pilihanSort == 1 || pilihanSort == 2) {
+            nilaiKiri = keHurufKecil(data.users[kiri].nama);
+            nilaiKanan = keHurufKecil(data.users[kanan].nama);
+        } else {
+            nilaiKiri = keHurufKecil(data.users[kiri].username);
+            nilaiKanan = keHurufKecil(data.users[kanan].username);
+        }
+
+        if (pilihanSort == 1 || pilihanSort == 3) {
+            return nilaiKiri > nilaiKanan;
+        }
+        return nilaiKiri < nilaiKanan;
+    };
+
+    int n = static_cast<int>(indeksPasien.size());
+    for (int i = 0; i < n - 1; i++) {
+        bool adaTukar = false;
+        for (int j = 0; j < n - i - 1; j++) {
+            if (harusTukar(indeksPasien[j], indeksPasien[j + 1])) {
+                int temp = indeksPasien[j];
+                indeksPasien[j] = indeksPasien[j + 1];
+                indeksPasien[j + 1] = temp;
+                adaTukar = true;
+            }
+        }
+        if (!adaTukar) {
+            break;
+        }
+    }
+
+    cout << "\nHasil urut daftar pasien:\n";
+    tampilkanDaftarPasienByIndex(data, indeksPasien);
+}
 
 static int pilihPasienUntukMonitoring(const AppData& data) {
     if (data.userCount == 0) {
@@ -208,8 +336,10 @@ void menuDokter(AppData& data, const string& userFilePath, const string& sleepRe
         cout << "\n========== MENU DOKTER ==========";
         cout << "\n1. Buat akun pasien";
         cout << "\n2. Lihat daftar pasien";
-        cout << "\n3. Monitoring pasien";
-        cout << "\n4. Logout";
+        cout << "\n3. Cari pasien";
+        cout << "\n4. Urutkan daftar pasien";
+        cout << "\n5. Monitoring pasien";
+        cout << "\n6. Logout";
         cout << "\nPilihan: ";
         cin >> pilihan;
 
@@ -230,14 +360,20 @@ void menuDokter(AppData& data, const string& userFilePath, const string& sleepRe
                 tampilkanDaftarPasienSingkat(data);
                 break;
             case 3:
-                monitoringPasienOlehDokter(data, sleepRecordFilePath);
+                cariPasien(data);
                 break;
             case 4:
+                urutkanDanTampilkanPasien(data);
+                break;
+            case 5:
+                monitoringPasienOlehDokter(data, sleepRecordFilePath);
+                break;
+            case 6:
                 cout << "\nLogout dokter berhasil.\n";
                 break;
             default:
                 cout << "\n[ERROR] Menu tidak tersedia.\n";
                 break;
         }
-    } while (pilihan != 4);
+    } while (pilihan != 6);
 }
