@@ -1112,7 +1112,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="update-pasien" id="cS5cLXlhbh7cO_xBIoop">
-    <mxGraphModel dx="2059" dy="775" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2906" dy="1318" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="NiEhBFOaJTJHBc6uq4c1-0" />
         <mxCell id="NiEhBFOaJTJHBc6uq4c1-1" parent="NiEhBFOaJTJHBc6uq4c1-0" />
@@ -1346,6 +1346,15 @@
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="126" y="918" as="sourcePoint" />
             <mxPoint x="160" y="918" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MfP7Wc4Gy60bjvi0DSsV-0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="NiEhBFOaJTJHBc6uq4c1-1" source="NgAuLtK0-8aFbKfQL1Dp-24" target="NgAuLtK0-8aFbKfQL1Dp-22">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-69" y="225" />
+              <mxPoint x="-69" y="1095" />
+              <mxPoint x="387" y="1095" />
+            </Array>
           </mxGeometry>
         </mxCell>
       </root>
@@ -2399,7 +2408,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="wVcPQNMeXNTGGhSCvUC_" name="Hapus_semua_ data_tidur_pasien()">
-    <mxGraphModel dx="1869" dy="2298" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1582" dy="2114" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -2448,7 +2457,7 @@
             <mxPoint x="222" y="824" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="lu1srDf33cAzS-YYdqsT-24" value="Output riwayat berhasil di hapus" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+        <mxCell id="lu1srDf33cAzS-YYdqsT-24" value="Output akun&amp;nbsp;&lt;div&gt;berhasil di hapus&lt;/div&gt;" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
           <mxGeometry x="162" y="690" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="lu1srDf33cAzS-YYdqsT-26" value="True" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
@@ -2478,6 +2487,9 @@
         </mxCell>
         <mxCell id="lu1srDf33cAzS-YYdqsT-37" value="True" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="447.00000000000045" y="326" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="l28QXjuvqKp3zxJvLBTM-6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="lu1srDf33cAzS-YYdqsT-39" target="l28QXjuvqKp3zxJvLBTM-4">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="lu1srDf33cAzS-YYdqsT-39" value="Data_Pasien" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
           <mxGeometry x="183" y="435" width="77.25" height="95" as="geometry" />
@@ -2528,13 +2540,20 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="YBGGd2-SKyTIMIbcY8zg-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.257;entryY=0.212;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="lu1srDf33cAzS-YYdqsT-39" target="lu1srDf33cAzS-YYdqsT-7">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="343" y="454" />
-              <mxPoint x="343" y="454" />
-            </Array>
-          </mxGeometry>
+        <mxCell id="l28QXjuvqKp3zxJvLBTM-1" value="True" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="286.00000000000045" y="118" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="l28QXjuvqKp3zxJvLBTM-2" value="False" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="22" y="116" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="l28QXjuvqKp3zxJvLBTM-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="l28QXjuvqKp3zxJvLBTM-3" target="Sy9_YM2Rlu_Znkm2AJ05-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l28QXjuvqKp3zxJvLBTM-3" value="X" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="456" y="207" width="42" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="l28QXjuvqKp3zxJvLBTM-4" value="X" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="321" y="461.5" width="42" height="42" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
