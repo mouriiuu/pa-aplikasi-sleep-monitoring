@@ -7,6 +7,7 @@
 
 bool formatJamValid(const std::string& jam);
 int konversiJamKeMenit(const std::string& jam);
+int konversiJamKeMenit(int jamAngka, int menitAngka);
 int hitungSelisihMenit(int menitMulai, int menitSelesai);
 int hitungSOL(const SleepRecord& record);
 int hitungWASO(const SleepRecord& record);

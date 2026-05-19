@@ -105,6 +105,15 @@ void loadSleepRecordsFromFile(AppData& data, const string& filePath) {
         record.jumlahTerbangun = atoi(parts[6].c_str());
         record.totalTerjagaMenit = atoi(parts[7].c_str());
         record.kualitasTidur = atoi(parts[8].c_str());
+        if (record.jumlahTerbangun < 0) {
+            record.jumlahTerbangun = 0;
+        }
+        if (record.totalTerjagaMenit < 0) {
+            record.totalTerjagaMenit = 0;
+        }
+        if (record.kualitasTidur < 0) {
+            record.kualitasTidur = 0;
+        }
         record.kondisiBangun = parts[9];
         record.sudahInputPagi = parts[10] == "1";
         data.sleepRecordCount++;

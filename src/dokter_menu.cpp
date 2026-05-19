@@ -263,6 +263,71 @@ static int hapusSemuaDataTidurPasien(AppData& data, const string& usernamePasien
     return awal - tulis;
 }
 
+static bool hapusPasienDariDaftar(AppData& data, const string& usernamePasien) {
+    int indexHapus = -1;
+    for (int i = 0; i < data.userCount; i++) {
+        if (data.users[i].username == usernamePasien) {
+            indexHapus = i;
+            break;
+        }
+    }
+
+    if (indexHapus == -1) {
+        return false;
+    }
+
+    for (int i = indexHapus; i < data.userCount - 1; i++) {
+        data.users[i] = data.users[i + 1];
+    }
+    data.userCount--;
+    return true;
+}
+
+static void hapusPasienDanSemuaDataTidurOlehDokter(
+    AppData& data,
+    const string& userFilePath,
+    const string& sleepRecordFilePath
+) {
+    if (data.userCount == 0) {
+        cout << "\n[ERROR] Belum ada pasien terdaftar.\n";
+        return;
+    }
+
+    int pasienIndex = pilihPasienUntukMonitoring(data);
+    if (pasienIndex == -1) {
+        return;
+    }
+
+    const User pasienDipilih = data.users[pasienIndex];
+    cout << "\nPasien yang akan dihapus: "
+         << pasienDipilih.nama << " (" << pasienDipilih.username << ")\n";
+    string konfirmasi = inputBarisMenu("Ketik Y untuk konfirmasi hapus akun pasien + semua data tidurnya: ");
+    if (konfirmasi != "Y" && konfirmasi != "y") {
+        cout << "\nAksi hapus dibatalkan.\n";
+        return;
+    }
+
+    AppData backup = data;
+
+    bool pasienTerhapus = hapusPasienDariDaftar(data, pasienDipilih.username);
+    int jumlahDataTidurDihapus = hapusSemuaDataTidurPasien(data, pasienDipilih.username);
+
+    if (!pasienTerhapus) {
+        data = backup;
+        cout << "\n[ERROR] Gagal menghapus akun pasien.\n";
+        return;
+    }
+
+    if (!saveUsersToFile(data, userFilePath) || !saveSleepRecordsToFile(data, sleepRecordFilePath)) {
+        data = backup;
+        cout << "\n[ERROR] Gagal menyimpan penghapusan ke file. Perubahan dibatalkan.\n";
+        return;
+    }
+
+    cout << "\n[SUKSES] Akun pasien berhasil dihapus.\n";
+    cout << "[SUKSES] " << jumlahDataTidurDihapus << " data tidur terkait juga dihapus.\n";
+}
+
 static void monitoringPasienOlehDokter(AppData& data, const string& sleepRecordFilePath) {
     int pasienIndex = pilihPasienUntukMonitoring(data);
     if (pasienIndex == -1) {
@@ -339,7 +404,8 @@ void menuDokter(AppData& data, const string& userFilePath, const string& sleepRe
         cout << "\n3. Cari pasien";
         cout << "\n4. Urutkan daftar pasien";
         cout << "\n5. Monitoring pasien";
-        cout << "\n6. Logout";
+        cout << "\n6. Hapus pasien + semua data tidurnya";
+        cout << "\n7. Logout";
         cout << "\nPilihan: ";
         cin >> pilihan;
 
@@ -369,11 +435,14 @@ void menuDokter(AppData& data, const string& userFilePath, const string& sleepRe
                 monitoringPasienOlehDokter(data, sleepRecordFilePath);
                 break;
             case 6:
+                hapusPasienDanSemuaDataTidurOlehDokter(data, userFilePath, sleepRecordFilePath);
+                break;
+            case 7:
                 cout << "\nLogout dokter berhasil.\n";
                 break;
             default:
                 cout << "\n[ERROR] Menu tidak tersedia.\n";
                 break;
         }
-    } while (pilihan != 6);
+    } while (pilihan != 7);
 }

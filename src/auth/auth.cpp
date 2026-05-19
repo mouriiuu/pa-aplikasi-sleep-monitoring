@@ -17,6 +17,11 @@ static string inputBaris(const string& pesan) {
     return nilai;
 }
 
+static bool lanjutBuatAkunSetelahError() {
+    string jawaban = inputBaris("Ulangi input akun? (Y=ya, N/Enter=kembali): ");
+    return jawaban == "Y" || jawaban == "y";
+}
+
 bool usernameSudahAda(const AppData& data, const string& username) {
     for (int i = 0; i < data.userCount; i++) {
         if (data.users[i].username == username) {
@@ -41,21 +46,37 @@ bool buatAkunPasienOlehDokter(AppData& data, const string& userFilePath) {
 
         if (nama.empty() || username.empty() || password.empty()) {
             cout << "\n[ERROR] Semua field wajib diisi.\n";
+            if (!lanjutBuatAkunSetelahError()) {
+                cout << "[INFO] Pembuatan akun dibatalkan.\n";
+                return false;
+            }
             continue;
         }
 
         if (password.length() < 6) {
             cout << "\n[ERROR] Password minimal 6 karakter.\n";
+            if (!lanjutBuatAkunSetelahError()) {
+                cout << "[INFO] Pembuatan akun dibatalkan.\n";
+                return false;
+            }
             continue;
         }
 
         if (username.find('|') != string::npos || nama.find('|') != string::npos || password.find('|') != string::npos) {
             cout << "\n[ERROR] Karakter '|' tidak boleh dipakai.\n";
+            if (!lanjutBuatAkunSetelahError()) {
+                cout << "[INFO] Pembuatan akun dibatalkan.\n";
+                return false;
+            }
             continue;
         }
 
         if (usernameSudahAda(data, username)) {
             cout << "\n[ERROR] Username sudah dipakai. Gunakan username lain.\n";
+            if (!lanjutBuatAkunSetelahError()) {
+                cout << "[INFO] Pembuatan akun dibatalkan.\n";
+                return false;
+            }
             continue;
         }
 
@@ -67,6 +88,10 @@ bool buatAkunPasienOlehDokter(AppData& data, const string& userFilePath) {
         if (!saveUsersToFile(data, userFilePath)) {
             cout << "\n[ERROR] Data user gagal disimpan ke file.\n";
             data.userCount--;
+            if (!lanjutBuatAkunSetelahError()) {
+                cout << "[INFO] Pembuatan akun dibatalkan.\n";
+                return false;
+            }
             continue;
         }
 

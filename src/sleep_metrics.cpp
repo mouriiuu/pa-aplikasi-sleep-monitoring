@@ -27,6 +27,10 @@ bool formatJamValid(const string& jam) {
 int konversiJamKeMenit(const string& jam) {
     int jamAngka = (jam[0] - '0') * 10 + (jam[1] - '0');
     int menitAngka = (jam[3] - '0') * 10 + (jam[4] - '0');
+    return konversiJamKeMenit(jamAngka, menitAngka);
+}
+
+int konversiJamKeMenit(int jamAngka, int menitAngka) {
     return jamAngka * 60 + menitAngka;
 }
 
@@ -92,20 +96,26 @@ void tampilkanIndikatorSleepDiary(const SleepRecord& record) {
     double se = hitungSE(record);
 
     cout << "\n--- HASIL INDIKATOR SLEEP DIARY ---\n";
-    cout << "SOL (menit)                  : " << sol << "\n";
-    cout << "WASO (menit)                 : " << waso << "\n";
-    cout << "Number of Awakenings         : " << noa << "\n";
+    cout << "SOL - Sleep Onset Latency (Latensi Mulai Tidur)                 : " << sol << " menit\n";
+    cout << "WASO - Wake After Sleep Onset (Total Waktu Terjaga Saat Malam)  : " << waso << " menit\n";
+    cout << "NoA - Number of Awakenings (Jumlah Terbangun)                   : " << noa << " kali\n";
     cout << "Waktu di tempat tidur (TIB)  : " << tib << " menit\n";
-    cout << "Total Sleep Time (TST)       : " << tst << " menit\n";
-    cout << "Sleep Efficiency (SE)        : " << fixed << setprecision(2) << se << "%\n";
+    cout << "TST - Total Sleep Time (Total Waktu Tidur)                      : " << tst << " menit\n";
+    cout << "SE - Sleep Efficiency (Efisiensi Tidur)                         : "
+         << fixed << setprecision(2) << se << "%\n";
     cout << defaultfloat;
 }
 
 void tampilkanIndikatorSingkatRecord(const SleepRecord& record) {
-    cout << "  SOL=" << hitungSOL(record) << " mnt";
-    cout << ", WASO=" << hitungWASO(record) << " mnt";
-    cout << ", NoA=" << hitungNumberOfAwakenings(record);
-    cout << ", TST=" << hitungTST(record) << " mnt";
-    cout << ", SE=" << fixed << setprecision(2) << hitungSE(record) << "%\n";
+    cout << "  SOL  (Sleep Onset Latency / Latensi Mulai Tidur)        : "
+         << hitungSOL(record) << " mnt\n";
+    cout << "  WASO (Wake After Sleep Onset / Total Terjaga Malam)     : "
+         << hitungWASO(record) << " mnt\n";
+    cout << "  NoA  (Number of Awakenings / Jumlah Terbangun)          : "
+         << hitungNumberOfAwakenings(record) << "\n";
+    cout << "  TST  (Total Sleep Time / Total Waktu Tidur)             : "
+         << hitungTST(record) << " mnt\n";
+    cout << "  SE   (Sleep Efficiency / Efisiensi Tidur)               : "
+         << fixed << setprecision(2) << hitungSE(record) << "%\n";
     cout << defaultfloat;
 }

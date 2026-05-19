@@ -1,5 +1,7 @@
 #include "pasien_menu.h"
 
+#include <climits>
+#include <cctype>
 #include <iostream>
 
 #include "data_store.h"
@@ -7,6 +9,28 @@
 #include "sleep_metrics.h"
 
 using namespace std;
+
+static bool parseBilanganBulatNonNegatif(const string& teks, int& hasil, bool& terlaluBesar) {
+    terlaluBesar = false;
+    if (teks.empty()) {
+        return false;
+    }
+
+    long long nilai = 0;
+    for (char c : teks) {
+        if (!isdigit(static_cast<unsigned char>(c))) {
+            return false;
+        }
+        nilai = nilai * 10 + (c - '0');
+        if (nilai > INT_MAX) {
+            terlaluBesar = true;
+            return false;
+        }
+    }
+
+    hasil = static_cast<int>(nilai);
+    return true;
+}
 
 static int cariJurnalMalamBelumLengkap(const AppData& data, const string& usernamePasien) {
     for (int i = data.sleepRecordCount - 1; i >= 0; i--) {
@@ -165,31 +189,67 @@ static void inputDataPagi(AppData& data, int userIndex, const string& sleepRecor
         int jumlahTerbangun;
         int totalTerjagaMenit;
         int kualitasTidur;
+        string inputJumlahTerbangun;
+        string inputTotalTerjaga;
+        string inputKualitas;
+        bool terlaluBesar;
 
         cout << "Jumlah terbangun             : ";
-        cin >> jumlahTerbangun;
+        cin >> inputJumlahTerbangun;
         if (cin.fail()) {
             cin.clear();
             cin.ignore(10000, '\n');
             cout << "\n[ERROR] Jumlah terbangun harus angka.\n";
             continue;
         }
+        if (!parseBilanganBulatNonNegatif(inputJumlahTerbangun, jumlahTerbangun, terlaluBesar)) {
+            cin.ignore(10000, '\n');
+            if (terlaluBesar) {
+                cout << "\n[ERROR] Jumlah terbangun terlalu besar.\n";
+            } else {
+                cout << "\n[ERROR] Jumlah terbangun harus angka bulat non-negatif.\n";
+            }
+            continue;
+        }
 
         cout << "Total lama terjaga (menit)   : ";
-        cin >> totalTerjagaMenit;
+        cin >> inputTotalTerjaga;
         if (cin.fail()) {
             cin.clear();
             cin.ignore(10000, '\n');
             cout << "\n[ERROR] Total terjaga harus angka.\n";
             continue;
         }
+        if (!parseBilanganBulatNonNegatif(inputTotalTerjaga, totalTerjagaMenit, terlaluBesar)) {
+            cin.ignore(10000, '\n');
+            if (terlaluBesar) {
+                cout << "\n[ERROR] Total terjaga terlalu besar.\n";
+            } else {
+                cout << "\n[ERROR] Total terjaga harus angka bulat non-negatif.\n";
+            }
+            continue;
+        }
 
         cout << "Kualitas tidur (1-10)        : ";
-        cin >> kualitasTidur;
+        cin >> inputKualitas;
         if (cin.fail()) {
             cin.clear();
             cin.ignore(10000, '\n');
             cout << "\n[ERROR] Kualitas tidur harus angka.\n";
+            continue;
+        }
+        if (!parseBilanganBulatNonNegatif(inputKualitas, kualitasTidur, terlaluBesar)) {
+            cin.ignore(10000, '\n');
+            if (terlaluBesar) {
+                cout << "\n[ERROR] Kualitas tidur terlalu besar.\n";
+            } else {
+                cout << "\n[ERROR] Kualitas tidur harus angka bulat.\n";
+            }
+            continue;
+        }
+        if (kualitasTidur < 1 || kualitasTidur > 10) {
+            cin.ignore(10000, '\n');
+            cout << "\n[ERROR] Kualitas tidur harus antara 1-10.\n";
             continue;
         }
 
@@ -206,11 +266,6 @@ static void inputDataPagi(AppData& data, int userIndex, const string& sleepRecor
             continue;
         }
 
-        if (jumlahTerbangun < 0 || totalTerjagaMenit < 0 || kualitasTidur < 1 || kualitasTidur > 10) {
-            cout << "\n[ERROR] Input angka tidak valid.\n";
-            continue;
-        }
-
         if (berisiKarakterTerlarang(jamMulaiTidurFinal) || berisiKarakterTerlarang(jamBangun) || berisiKarakterTerlarang(kondisiBangun)) {
             cout << "\n[ERROR] Karakter '|' tidak boleh dipakai.\n";
             continue;
@@ -218,6 +273,10 @@ static void inputDataPagi(AppData& data, int userIndex, const string& sleepRecor
 
         int mulaiTidurFinalMenit = konversiJamKeMenit(jamMulaiTidurFinal);
         int jamBangunMenit = konversiJamKeMenit(jamBangun);
+        if (mulaiTidurFinalMenit == jamBangunMenit) {
+            cout << "\n[ERROR] Jam bangun harus lebih dari jam mulai tidur final (tidak boleh sama).\n";
+            continue;
+        }
         int durasiTidurDasar = hitungSelisihMenit(mulaiTidurFinalMenit, jamBangunMenit);
         if (totalTerjagaMenit > durasiTidurDasar) {
             cout << "\n[ERROR] Total terjaga melebihi durasi dari mulai tidur final hingga bangun.\n";
@@ -318,20 +377,15 @@ static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFi
             return;
         }
 
-        bool valid = true;
-        for (char c : inputpilihan) {
-            if (!isdigit(c)) {
-                valid = false;
-                break;
+        bool terlaluBesar = false;
+        if (!parseBilanganBulatNonNegatif(inputpilihan, pilih, terlaluBesar)) {
+            if (terlaluBesar) {
+                cout << "\n[ERROR] Pilihan terlalu besar.\n";
+            } else {
+                cout << "\n[ERROR] Pilihan harus berupa angka.\n";
             }
-        }
-
-        if (!valid) {
-            cout << "\n[ERROR] Pilihan harus berupa angka.\n";
             continue;
         }
-
-        pilih = stoi(inputpilihan);
 
         if (pilih < 1 || pilih > jumlah) {
             cout << "\n[ERROR] Pilihan tidak valid.\n";
@@ -449,24 +503,13 @@ static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFi
                     break;
                 }
 
-                bool valid = true;
-
-                for (char c : inputTerbangun) {
-                    if (!isdigit(c)) {
-                        valid = false;
-                        break;
+                bool terlaluBesar = false;
+                if (!parseBilanganBulatNonNegatif(inputTerbangun, terbangunBaru, terlaluBesar)) {
+                    if (terlaluBesar) {
+                        cout << "\n[ERROR] Jumlah terbangun terlalu besar.\n";
+                    } else {
+                        cout << "\n[ERROR] Jumlah terbangun harus angka bulat non-negatif.\n";
                     }
-                }
-
-                if (!valid) {
-                    cout << "\n[ERROR] Jumlah terbangun harus angka.\n";
-                    continue;
-                }
-                
-                terbangunBaru = stoi(inputTerbangun);
-
-                if (terbangunBaru < 0) {
-                    cout << "\n[ERROR] Jumlah terbangun tidak boleh negatif.\n";
                     continue;
                 }
 
@@ -484,24 +527,13 @@ static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFi
                     break;
                 }
 
-                bool valid = true;
-
-                for (char c : inputTerjaga) {
-                    if (!isdigit(c)) {
-                        valid = false;
-                        break;
+                bool terlaluBesar = false;
+                if (!parseBilanganBulatNonNegatif(inputTerjaga, terjagaBaru, terlaluBesar)) {
+                    if (terlaluBesar) {
+                        cout << "\n[ERROR] Total terjaga terlalu besar.\n";
+                    } else {
+                        cout << "\n[ERROR] Total terjaga harus angka bulat non-negatif.\n";
                     }
-                }
-
-                if (!valid) {
-                    cout << "\n[ERROR] Total terjaga harus angka.\n";
-                    continue;
-                }
-
-                terjagaBaru = stoi(inputTerjaga);
-
-                if (terjagaBaru < 0) {
-                    cout << "\n[ERROR] Total terjaga tidak boleh negatif.\n";
                     continue;
                 }
 
@@ -519,21 +551,15 @@ static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFi
                     break;
                 }
 
-                bool valid = true;
-
-                for (char c : inputKualitas) {
-                    if (!isdigit(c)) {
-                        valid = false;
-                        break;
+                bool terlaluBesar = false;
+                if (!parseBilanganBulatNonNegatif(inputKualitas, kualitasBaru, terlaluBesar)) {
+                    if (terlaluBesar) {
+                        cout << "\n[ERROR] Kualitas tidur terlalu besar.\n";
+                    } else {
+                        cout << "\n[ERROR] Kualitas tidur harus angka bulat.\n";
                     }
-                }
-
-                if (!valid) {
-                    cout << "\n[ERROR] Kualitas tidur harus angka.\n";
                     continue;
                 }
-
-                kualitasBaru = stoi(inputKualitas);
 
                 if (kualitasBaru < 1 || kualitasBaru > 10) {
                     cout << "\n[ERROR] Kualitas tidur harus antara 1-10.\n";
@@ -566,6 +592,11 @@ static void editjurnal(AppData& data, int userIndex, const string& sleepRecordFi
                 konversiJamKeMenit(jamTidurBaru),
                 konversiJamKeMenit(jamBangunBaru)
             );
+
+            if (konversiJamKeMenit(jamTidurBaru) == konversiJamKeMenit(jamBangunBaru)) {
+                cout << "\n[ERROR] Jam bangun harus lebih dari jam mulai tidur final (tidak boleh sama).\n";
+                continue;
+            }
 
             if (terjagaBaru > durasiDasar) {
                 cout << "\n[ERROR] Total terjaga melebihi durasi tidur.\n";
@@ -631,21 +662,15 @@ static void hapusdatajurnal(AppData& data, int userIndex, const string& sleepRec
             return;
         }
 
-        bool valid = true;
-
-        for (char c : inputpilihan) {
-            if (!isdigit(c)) {
-                valid = false;
-                break;
+        bool terlaluBesar = false;
+        if (!parseBilanganBulatNonNegatif(inputpilihan, pilih, terlaluBesar)) {
+            if (terlaluBesar) {
+                cout << "\n[ERROR] Pilihan terlalu besar.\n";
+            } else {
+                cout << "\n[ERROR] Pilihan harus berupa angka.\n";
             }
-        }
-
-        if (!valid) {
-            cout << "\n[ERROR] Pilihan harus berupa angka.\n";
             continue;
         }
-
-        pilih = stoi(inputpilihan);
 
         if (pilih < 1 || pilih > jumlah) {
             cout << "\n[ERROR] Pilihan tidak valid.\n";
