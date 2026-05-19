@@ -16,6 +16,7 @@ string inputBarisMenu(const string& pesan) {
 
 string ambilJamSekarang() {
     time_t waktuSekarang = time(0);
+    // Pointer ke waktu lokal.
     tm* waktuLokal = localtime(&waktuSekarang);
     stringstream hasil;
 

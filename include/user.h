@@ -27,6 +27,7 @@ struct SleepRecord {
 };
 
 struct AppData {
+    // Array statis utama aplikasi.
     User users[MAX_USERS];
     int userCount;
     SleepRecord sleepRecords[MAX_SLEEP_RECORDS];

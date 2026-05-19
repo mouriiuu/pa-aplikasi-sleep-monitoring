@@ -11,6 +11,7 @@
 using namespace std;
 
 static bool parseBilanganBulatNonNegatif(const string& teks, int& hasil, bool& terlaluBesar) {
+    // Guard input angka + overflow.
     terlaluBesar = false;
     if (teks.empty()) {
         return false;
@@ -185,6 +186,11 @@ static void inputDataPagi(AppData& data, int userIndex, const string& sleepRecor
             cout << "\n[ERROR] Format jam harus HH:MM (24 jam).\n";
             continue;
         }
+        if (konversiJamKeMenit(jamMulaiTidurFinal) == konversiJamKeMenit(jamBangun)) {
+            cin.ignore(10000, '\n');
+            cout << "\n[ERROR] Jam bangun harus lebih dari jam mulai tidur final (tidak boleh sama).\n";
+            continue;
+        }
         
         int jumlahTerbangun;
         int totalTerjagaMenit;
@@ -273,10 +279,6 @@ static void inputDataPagi(AppData& data, int userIndex, const string& sleepRecor
 
         int mulaiTidurFinalMenit = konversiJamKeMenit(jamMulaiTidurFinal);
         int jamBangunMenit = konversiJamKeMenit(jamBangun);
-        if (mulaiTidurFinalMenit == jamBangunMenit) {
-            cout << "\n[ERROR] Jam bangun harus lebih dari jam mulai tidur final (tidak boleh sama).\n";
-            continue;
-        }
         int durasiTidurDasar = hitungSelisihMenit(mulaiTidurFinalMenit, jamBangunMenit);
         if (totalTerjagaMenit > durasiTidurDasar) {
             cout << "\n[ERROR] Total terjaga melebihi durasi dari mulai tidur final hingga bangun.\n";

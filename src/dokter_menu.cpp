@@ -53,6 +53,7 @@ static void cariPasien(const AppData& data) {
     }
 
     vector<int> hasil;
+    // Linear search nama/username.
     for (int i = 0; i < data.userCount; i++) {
         if (mengandungTanpaCase(data.users[i].nama, kataKunci) ||
             mengandungTanpaCase(data.users[i].username, kataKunci)) {
@@ -119,6 +120,7 @@ static void urutkanDanTampilkanPasien(const AppData& data) {
     };
 
     int n = static_cast<int>(indeksPasien.size());
+    // Bubble sort.
     for (int i = 0; i < n - 1; i++) {
         bool adaTukar = false;
         for (int j = 0; j < n - i - 1; j++) {

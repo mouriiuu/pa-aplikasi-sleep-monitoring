@@ -30,6 +30,7 @@ int konversiJamKeMenit(const string& jam) {
     return konversiJamKeMenit(jamAngka, menitAngka);
 }
 
+// Overloading versi angka.
 int konversiJamKeMenit(int jamAngka, int menitAngka) {
     return jamAngka * 60 + menitAngka;
 }
