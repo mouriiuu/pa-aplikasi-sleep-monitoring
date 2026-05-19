@@ -1500,7 +1500,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="AWeWMoo5rGXj-AklxyHM" name="menu-dokter">
-    <mxGraphModel dx="906" dy="586" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1042" dy="674" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1553,7 +1553,7 @@
             <mxPoint x="653" y="430" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="IQDBZXt0yxBqd_sBufiF-22" target="1lSS44-L1VYTL3xWtOc4-2">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="IQDBZXt0yxBqd_sBufiF-22" target="1lSS44-L1VYTL3xWtOc4-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="IQDBZXt0yxBqd_sBufiF-22" value="Pilihan 3?" style="strokeWidth=1;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" parent="1" vertex="1">
@@ -1632,59 +1632,59 @@
             <mxPoint x="1205" y="480" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="1lSS44-L1VYTL3xWtOc4-2" target="1lSS44-L1VYTL3xWtOc4-3">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="1lSS44-L1VYTL3xWtOc4-2" target="1lSS44-L1VYTL3xWtOc4-3" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="1lSS44-L1VYTL3xWtOc4-2" target="-JuIzDJ5Y4brV1y8VHvD-9">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="1lSS44-L1VYTL3xWtOc4-2" target="-JuIzDJ5Y4brV1y8VHvD-9" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="1lSS44-L1VYTL3xWtOc4-2" value="Pilihan 4?" style="strokeWidth=1;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+        <mxCell id="1lSS44-L1VYTL3xWtOc4-2" value="Pilihan 4?" style="strokeWidth=1;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" parent="1" vertex="1">
           <mxGeometry x="768" y="281" width="100" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="1lSS44-L1VYTL3xWtOc4-3" target="IQDBZXt0yxBqd_sBufiF-28">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="1lSS44-L1VYTL3xWtOc4-3" target="IQDBZXt0yxBqd_sBufiF-28" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="1lSS44-L1VYTL3xWtOc4-3" target="-JuIzDJ5Y4brV1y8VHvD-10">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="1lSS44-L1VYTL3xWtOc4-3" target="-JuIzDJ5Y4brV1y8VHvD-10" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="1lSS44-L1VYTL3xWtOc4-3" value="Pilihan 5?" style="strokeWidth=1;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+        <mxCell id="1lSS44-L1VYTL3xWtOc4-3" value="Pilihan 5?" style="strokeWidth=1;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" parent="1" vertex="1">
           <mxGeometry x="920" y="281" width="100" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=1;" edge="1" parent="1">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=1;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="810" y="585" as="targetPoint" />
             <mxPoint x="810" y="482" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-9" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Daftar_Pasien()&lt;/span&gt;&lt;/div&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-9" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Daftar_Pasien()&lt;/span&gt;&lt;/div&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
           <mxGeometry x="757" y="424" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-10" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Menu_Monitoring_&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Pasien()&lt;/span&gt;&lt;/div&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-10" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Monitoring_&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Pasien()&lt;/span&gt;&lt;/div&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
           <mxGeometry x="903" y="424" width="136" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-15" value="False" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-15" value="False" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1016" y="300" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-16" value="True" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-16" value="True" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="971" y="384" width="52" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-18" value="False" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-18" value="False" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="864" y="301" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-19" value="True" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-19" value="True" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="819" y="384" width="52" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-22" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Urutkan_Pasien()&lt;/span&gt;&lt;/div&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-22" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Urutkan_Pasien()&lt;/span&gt;&lt;/div&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
           <mxGeometry x="593" y="430" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-23" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Cari_Pasien()&lt;/span&gt;&lt;/div&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+        <mxCell id="-JuIzDJ5Y4brV1y8VHvD-23" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Cari_Pasien()&lt;/span&gt;&lt;/div&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
           <mxGeometry x="426" y="430" width="120" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="PZq9KEBoQ9y3PynDtDVv" name="Menu-monitoring-pasien">
-    <mxGraphModel dx="1389" dy="899" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1226" dy="793" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
