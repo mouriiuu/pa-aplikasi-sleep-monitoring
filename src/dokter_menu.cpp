@@ -365,8 +365,7 @@ static void monitoringPasienOlehDokter(
         cout << "Pasien: " << pasienDipilih.nama << " (" << pasienDipilih.username << ")\n";
         cout << "1. Lihat semua data tidur pasien\n";
         cout << "2. Lihat ringkasan pasien\n";
-        cout << "3. Hapus akun pasien + semua data tidurnya\n";
-        cout << "4. Kembali ke menu dokter\n";
+        cout << "3. Kembali ke menu dokter\n";
         cout << "Pilihan: ";
         cin >> pilihan;
 
@@ -386,37 +385,14 @@ static void monitoringPasienOlehDokter(
             case 2:
                 tampilkanRingkasanPasien(data, pasienDipilih);
                 break;
-            case 3: {
-                string konfirmasi = inputBarisMenu("Ketik Y untuk konfirmasi hapus akun pasien + semua data tidurnya: ");
-                if (konfirmasi != "Y" && konfirmasi != "y") {
-                    cout << "\nAksi hapus dibatalkan.\n";
-                    break;
-                }
-
-                int jumlahDihapus = 0;
-                if (!hapusPasienDanSemuaDataByUsername(
-                        data,
-                        pasienDipilih.username,
-                        userFilePath,
-                        sleepRecordFilePath,
-                        jumlahDihapus)) {
-                    cout << "\n[ERROR] Gagal menghapus akun pasien.\n";
-                    break;
-                }
-
-                cout << "\n[SUKSES] Akun pasien berhasil dihapus.\n";
-                cout << "[SUKSES] " << jumlahDihapus << " data tidur terkait juga dihapus.\n";
-                cout << "\nKembali ke menu dokter.\n";
-                return;
-            }
-            case 4:
+            case 3:
                 cout << "\nKembali ke menu dokter.\n";
                 break;
             default:
                 cout << "\n[ERROR] Menu monitoring tidak tersedia.\n";
                 break;
         }
-    } while (pilihan != 4);
+    } while (pilihan != 3);
 }
 
 void menuDokter(AppData& data, const string& userFilePath, const string& sleepRecordFilePath) {
