@@ -283,6 +283,31 @@ static bool hapusPasienDariDaftar(AppData& data, const string& usernamePasien) {
     return true;
 }
 
+static bool hapusPasienDanSemuaDataByUsername(
+    AppData& data,
+    const string& usernamePasien,
+    const string& userFilePath,
+    const string& sleepRecordFilePath,
+    int& jumlahDataTidurDihapus
+) {
+    AppData backup = data;
+
+    bool pasienTerhapus = hapusPasienDariDaftar(data, usernamePasien);
+    jumlahDataTidurDihapus = hapusSemuaDataTidurPasien(data, usernamePasien);
+
+    if (!pasienTerhapus) {
+        data = backup;
+        return false;
+    }
+
+    if (!saveUsersToFile(data, userFilePath) || !saveSleepRecordsToFile(data, sleepRecordFilePath)) {
+        data = backup;
+        return false;
+    }
+
+    return true;
+}
+
 static void hapusPasienDanSemuaDataTidurOlehDokter(
     AppData& data,
     const string& userFilePath,
@@ -307,20 +332,14 @@ static void hapusPasienDanSemuaDataTidurOlehDokter(
         return;
     }
 
-    AppData backup = data;
-
-    bool pasienTerhapus = hapusPasienDariDaftar(data, pasienDipilih.username);
-    int jumlahDataTidurDihapus = hapusSemuaDataTidurPasien(data, pasienDipilih.username);
-
-    if (!pasienTerhapus) {
-        data = backup;
+    int jumlahDataTidurDihapus = 0;
+    if (!hapusPasienDanSemuaDataByUsername(
+            data,
+            pasienDipilih.username,
+            userFilePath,
+            sleepRecordFilePath,
+            jumlahDataTidurDihapus)) {
         cout << "\n[ERROR] Gagal menghapus akun pasien.\n";
-        return;
-    }
-
-    if (!saveUsersToFile(data, userFilePath) || !saveSleepRecordsToFile(data, sleepRecordFilePath)) {
-        data = backup;
-        cout << "\n[ERROR] Gagal menyimpan penghapusan ke file. Perubahan dibatalkan.\n";
         return;
     }
 
@@ -328,7 +347,11 @@ static void hapusPasienDanSemuaDataTidurOlehDokter(
     cout << "[SUKSES] " << jumlahDataTidurDihapus << " data tidur terkait juga dihapus.\n";
 }
 
-static void monitoringPasienOlehDokter(AppData& data, const string& sleepRecordFilePath) {
+static void monitoringPasienOlehDokter(
+    AppData& data,
+    const string& userFilePath,
+    const string& sleepRecordFilePath
+) {
     int pasienIndex = pilihPasienUntukMonitoring(data);
     if (pasienIndex == -1) {
         return;
@@ -342,7 +365,7 @@ static void monitoringPasienOlehDokter(AppData& data, const string& sleepRecordF
         cout << "Pasien: " << pasienDipilih.nama << " (" << pasienDipilih.username << ")\n";
         cout << "1. Lihat semua data tidur pasien\n";
         cout << "2. Lihat ringkasan pasien\n";
-        cout << "3. Hapus semua data tidur pasien\n";
+        cout << "3. Hapus akun pasien + semua data tidurnya\n";
         cout << "4. Kembali ke menu dokter\n";
         cout << "Pilihan: ";
         cin >> pilihan;
@@ -364,25 +387,27 @@ static void monitoringPasienOlehDokter(AppData& data, const string& sleepRecordF
                 tampilkanRingkasanPasien(data, pasienDipilih);
                 break;
             case 3: {
-                string konfirmasi = inputBarisMenu("Ketik Y untuk konfirmasi hapus semua data tidur pasien: ");
+                string konfirmasi = inputBarisMenu("Ketik Y untuk konfirmasi hapus akun pasien + semua data tidurnya: ");
                 if (konfirmasi != "Y" && konfirmasi != "y") {
                     cout << "\nAksi hapus dibatalkan.\n";
                     break;
                 }
 
-                int jumlahDihapus = hapusSemuaDataTidurPasien(data, pasienDipilih.username);
-                if (jumlahDihapus == 0) {
-                    cout << "\nTidak ada data tidur yang bisa dihapus.\n";
+                int jumlahDihapus = 0;
+                if (!hapusPasienDanSemuaDataByUsername(
+                        data,
+                        pasienDipilih.username,
+                        userFilePath,
+                        sleepRecordFilePath,
+                        jumlahDihapus)) {
+                    cout << "\n[ERROR] Gagal menghapus akun pasien.\n";
                     break;
                 }
 
-                if (!saveSleepRecordsToFile(data, sleepRecordFilePath)) {
-                    cout << "\n[ERROR] Gagal menyimpan penghapusan data tidur.\n";
-                    break;
-                }
-
-                cout << "\n[SUKSES] " << jumlahDihapus << " data tidur pasien berhasil dihapus.\n";
-                break;
+                cout << "\n[SUKSES] Akun pasien berhasil dihapus.\n";
+                cout << "[SUKSES] " << jumlahDihapus << " data tidur terkait juga dihapus.\n";
+                cout << "\nKembali ke menu dokter.\n";
+                return;
             }
             case 4:
                 cout << "\nKembali ke menu dokter.\n";
@@ -432,7 +457,7 @@ void menuDokter(AppData& data, const string& userFilePath, const string& sleepRe
                 urutkanDanTampilkanPasien(data);
                 break;
             case 5:
-                monitoringPasienOlehDokter(data, sleepRecordFilePath);
+                monitoringPasienOlehDokter(data, userFilePath, sleepRecordFilePath);
                 break;
             case 6:
                 hapusPasienDanSemuaDataTidurOlehDokter(data, userFilePath, sleepRecordFilePath);
